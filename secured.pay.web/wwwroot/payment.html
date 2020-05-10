@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width">
+    <title></title>
+    <script src="scripts/angular.min.js"></script>
+    <script src="scripts/service.js"></script>
+    <script src="scripts/app.js"></script>
+    <style>
+        .razorpay-payment-button {
+            color: red;
+        }
+    </style>
+</head>
+<body ng-app="pay-module" ng-controller="payCTRL" ng-init="initialize()">
+   
+    <div ng-show="!isTransComplete">
+        Paymnent Gateway<br />
+
+        Name : {{org_name}} ({{payee_name}}) <br />
+        Amount : {{amount}}<br />
+        Pay To : <br />
+        <button id="rzp-button1">Pay</button>
+        <script src="scripts/checkout.js"></script>
+    </div>
+    <div ng-show="isTransComplete">
+        <h4>Payment Successful</h4>
+        <h3>Please wait ... we are redirecting to app</h3>
+    </div>
+</body>
+</html>
