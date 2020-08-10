@@ -22,6 +22,7 @@ namespace secured.pay.api.Models
         public string OrderID { get; set; }
         public string Signature { get; set; }
         public string SuscriptionNumber { get; set; }
+        public string InvoiceNumber { get; set; }
     }
 
     public class OrderResponse
@@ -50,6 +51,7 @@ namespace secured.pay.api.Models
         public string PaymentType { get; set; }
         public string TransactionStep { get; set; }
         public string SuscriptionNumber { get; set; }
+        public string InvoiceNumber { get; set; }
         public int? ValidityInMonth { get; set; }
 
         public DateTime TransactionDate { get; set; }

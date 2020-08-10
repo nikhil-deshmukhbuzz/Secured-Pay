@@ -19,6 +19,53 @@ namespace secured.pay.api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("secured.pay.api.Models.C_Transaction", b =>
+                {
+                    b.Property<long>("C_TransactionID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("Amount");
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<string>("CustomerCode");
+
+                    b.Property<string>("Email");
+
+                    b.Property<string>("MobileNo");
+
+                    b.Property<DateTime?>("ModifiedOn");
+
+                    b.Property<string>("OrderID");
+
+                    b.Property<string>("PayeeName");
+
+                    b.Property<string>("PaymentID");
+
+                    b.Property<long>("PaymentStatusID");
+
+                    b.Property<long>("PaymentTypeID");
+
+                    b.Property<string>("ProductCode");
+
+                    b.Property<string>("Signature");
+
+                    b.Property<DateTime>("TransactionDate");
+
+                    b.Property<long?>("TransactionStepID");
+
+                    b.HasKey("C_TransactionID");
+
+                    b.HasIndex("PaymentStatusID");
+
+                    b.HasIndex("PaymentTypeID");
+
+                    b.HasIndex("TransactionStepID");
+
+                    b.ToTable("C_Transactions");
+                });
+
             modelBuilder.Entity("secured.pay.api.Models.PaymentStatus", b =>
                 {
                     b.Property<long>("PaymentStatusID")
@@ -107,6 +154,8 @@ namespace secured.pay.api.Migrations
 
                     b.Property<string>("Key");
 
+                    b.Property<int>("Unit");
+
                     b.Property<string>("Value");
 
                     b.HasKey("Razorpay_ConfigID");
@@ -192,6 +241,8 @@ namespace secured.pay.api.Migrations
 
                     b.Property<string>("ErrorUrl");
 
+                    b.Property<string>("InvoiceNumber");
+
                     b.Property<string>("MobileNo");
 
                     b.Property<DateTime?>("ModifiedOn");
@@ -215,6 +266,23 @@ namespace secured.pay.api.Migrations
                     b.HasIndex("StepID");
 
                     b.ToTable("TransactionSteps");
+                });
+
+            modelBuilder.Entity("secured.pay.api.Models.C_Transaction", b =>
+                {
+                    b.HasOne("secured.pay.api.Models.PaymentStatus", "PaymentStatus")
+                        .WithMany()
+                        .HasForeignKey("PaymentStatusID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("secured.pay.api.Models.PaymentType", "PaymentType")
+                        .WithMany()
+                        .HasForeignKey("PaymentTypeID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("secured.pay.api.Models.TransactionStep", "TransactionStep")
+                        .WithMany()
+                        .HasForeignKey("TransactionStepID");
                 });
 
             modelBuilder.Entity("secured.pay.api.Models.Transaction", b =>

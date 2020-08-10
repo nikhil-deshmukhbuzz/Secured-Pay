@@ -22,7 +22,7 @@ namespace secured.pay.api.Context
             Configuration = configuration;
         }
 
-        public DbSet<Razorpay_Config> Razorpay_Configs { get; set; }
+        
         public DbSet<PaymentStatus> PaymentStatuss { get; set; }
         public DbSet<PaymentType> PaymentTypes { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -30,12 +30,13 @@ namespace secured.pay.api.Context
         public DbSet<Step> Steps { get; set; }
         public DbSet<TransactionStep> TransactionSteps { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
-
+        public DbSet<C_Transaction> C_Transactions { get; set; }
+        public DbSet<Razorpay_Config> Razorpay_Configs { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string con = "Server=twittinest.c3gce2a7fa8f.ap-south-1.rds.amazonaws.com;Database=uat_DB_Sec_Pay;User Id=admin; Password=buzz#2008;";//GetConnectionString();
-           //  string con = "Server=NIKHIL\\SQLEXPRESS;Database=DB_Sec_Pay;Trusted_Connection=True;";//GetConnectionString();
+            string con = "Server=database-1.cuace85fwem4.ap-south-1.rds.amazonaws.com;Database=uat_DB_Sec_Pay;User Id=admin; Password=buzz#2008;";//GetConnectionString();
+            // string con = "Server=NIKHIL\\SQLEXPRESS;Database=DB_Sec_Pay;Trusted_Connection=True;";//GetConnectionString();
             optionsBuilder.UseSqlServer(con);
         }
 

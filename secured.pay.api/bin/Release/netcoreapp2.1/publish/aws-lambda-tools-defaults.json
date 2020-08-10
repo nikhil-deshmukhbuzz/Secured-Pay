@@ -12,7 +12,7 @@
     "framework"     : "netcoreapp2.1",
     "s3-prefix"     : "secured.pay.api/",
     "template"      : "serverless.template",
-    "template-parameters" : "\"ShouldCreateBucket\"=\"true\";\"BucketName\"=\"\"",
-    "s3-bucket"           : "pay.secured.api",
+    "template-parameters" : "\"ShouldCreateBucket\"=\"false\";\"BucketName\"=\"secured-pay-api\"",
+    "s3-bucket"           : "secured-pay-api",
     "stack-name"          : "api"
 }

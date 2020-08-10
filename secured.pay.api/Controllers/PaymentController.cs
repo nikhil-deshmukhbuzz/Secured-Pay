@@ -67,11 +67,12 @@ namespace secured.pay.api.Controllers
                 
                 string key = keyDetails.Value;
                 string secret = secretDetails.Value;
+                int unit = keyDetails.Unit == 0 ? 1 : keyDetails.Unit;
 
                 string receipt_id = "order_rcptid_"+ DateTime.Now.Ticks.ToString();
 
                 Dictionary<string, object> options = new Dictionary<string, object>();
-                options.Add("amount", orderRequest.Amount); 
+                options.Add("amount", orderRequest.Amount * unit); 
                 options.Add("receipt", receipt_id);
                 options.Add("currency", "INR");
                 options.Add("payment_capture", "0");
@@ -214,12 +215,75 @@ namespace secured.pay.api.Controllers
             }
         }
 
+        [Route("C_Pay")]
+        [HttpPost]
+        public IActionResult C_Pay([FromBody] OrderRequest orderRequest)
+        {
+            try
+            {
+                var transactionStep = context.TransactionSteps
+                .Include(i => i.RazorPay_Attribute)
+                .Where(w => w.TransactionStepID == orderRequest.TransactionStepID)
+                .FirstOrDefault();
+
+                var transaction = new C_Transaction()
+                {
+                    PaymentID = orderRequest.PaymentID,
+                    OrderID = orderRequest.OrderID,
+                    Signature = orderRequest.Signature,
+                    Amount = transactionStep.Amount,
+                    PayeeName = transactionStep.PayeeName,
+                    CustomerCode = transactionStep.CustomerCode,
+                    ProductCode = transactionStep.ProductCode,
+                    MobileNo = transactionStep.MobileNo,
+                    Email = transactionStep.Email,
+                    PaymentStatusID = (long)secured.pay.api.Enums.PaymentStatus.Success,
+                    PaymentTypeID = (long)secured.pay.api.Enums.PaymentType.Online,
+                    TransactionStepID = orderRequest.TransactionStepID,
+
+                    TransactionDate = DateTime.Now,
+                    CreatedOn = DateTime.Now,
+                    ModifiedOn = DateTime.Now
+                };
+
+                bool output = Add_C_Transaction(transaction);
+                OrderResponse orderResponse = null;
+
+                if (output)
+                {
+                    orderResponse = new OrderResponse()
+                    {
+                        Status = "SUCCESS"
+                    };
+                }
+                else
+                {
+                    orderResponse = new OrderResponse()
+                    {
+                        Status = "ERROR"
+                    };
+                }
+
+                orderResponse.Response = output;
+
+                return Ok(orderResponse);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                context = null;
+            }
+        }
+
 
         [Route("GetLatestTransaction")]
         [HttpPost]
         public IActionResult GetLatestTransaction([FromBody] OrderRequest orderRequest)
         {
-            TransactionResponse transactionResponse = new TransactionResponse();
+            TransactionResponse transactionResponse = null;
             try
             {
               
@@ -233,6 +297,7 @@ namespace secured.pay.api.Controllers
 
                 if(output != null)
                 {
+                    transactionResponse = new TransactionResponse();
                     transactionResponse.ProductCode = output.ProductCode;
                     transactionResponse.CustomerCode = output.CustomerCode;
                     transactionResponse.PaymentID = output.PaymentID;
@@ -266,6 +331,58 @@ namespace secured.pay.api.Controllers
             }
         }
 
+        [Route("GetTransactionByReceipt")]
+        [HttpPost]
+        public IActionResult GetTransactionByReceipt([FromBody] OrderRequest orderRequest)
+        {
+            TransactionResponse transactionResponse = null;
+            try
+            {
+
+                var output = context.C_Transactions
+                .Include(i => i.TransactionStep.Step)
+                .Include(i => i.PaymentStatus)
+                .Include(i => i.PaymentType)
+                .Where(w => w.ProductCode == orderRequest.ProductCode && w.CustomerCode == orderRequest.CustomerCode && w.TransactionStep.InvoiceNumber == orderRequest.InvoiceNumber )
+                .OrderByDescending(o => o.TransactionDate)
+                .FirstOrDefault();
+
+                if (output != null)
+                {
+                    transactionResponse = new TransactionResponse();
+                    transactionResponse.ProductCode = output.ProductCode;
+                    transactionResponse.CustomerCode = output.CustomerCode;
+                    transactionResponse.PaymentID = output.PaymentID;
+                    transactionResponse.OrderID = output.OrderID;
+                    transactionResponse.Signature = output.Signature;
+                    transactionResponse.Amount = output.Amount;
+                    transactionResponse.PayeeName = output.PayeeName;
+                    transactionResponse.MobileNo = output.MobileNo;
+                    transactionResponse.Email = output.Email;
+                    transactionResponse.PaymentStatus = output.PaymentStatus.Status;
+                    transactionResponse.PaymentType = output.PaymentType.Type;
+                    transactionResponse.TransactionStep = output.TransactionStep.Step.Name;
+                    transactionResponse.InvoiceNumber = output.TransactionStep.InvoiceNumber;
+                    transactionResponse.TransactionDate = output.TransactionDate;
+                    transactionResponse.CreatedOn = output.CreatedOn;
+                    transactionResponse.ModifiedOn = output.ModifiedOn;
+                }
+
+                return Ok(transactionResponse);
+
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                transactionResponse = null;
+                context = null;
+            }
+        }
+
         private bool OrderCreation(Order order,OrderRequest orderRequest,out long TransactionStepID)
         {
             bool result = false;
@@ -279,14 +396,15 @@ namespace secured.pay.api.Controllers
                     Email = orderRequest.Email,
                     ProductCode = orderRequest.ProductCode,
                     CustomerCode = orderRequest.CustomerCode,
-                    StepID = (long) secured.pay.api.Enums.Step.OrderCreated,
+                    StepID = (long)secured.pay.api.Enums.Step.OrderCreated,
                     ApplicationUrl = orderRequest.ApplicationUrl,
                     SucessUrl = orderRequest.SucessUrl,
                     ErrorUrl = orderRequest.ErrorUrl,
                     Amount = orderRequest.Amount,
                     CreatedOn = DateTime.Now,
                     ModifiedOn = DateTime.Now,
-                    SuscriptionNumber = orderRequest.SuscriptionNumber
+                    SuscriptionNumber = orderRequest.SuscriptionNumber,
+                    InvoiceNumber = orderRequest.InvoiceNumber
                 };
 
                 var json = JsonConvert.SerializeObject(order.Attributes, Newtonsoft.Json.Formatting.Indented);
@@ -352,6 +470,42 @@ namespace secured.pay.api.Controllers
                 result = true;
             }
             catch(Exception ex)
+            {
+                result = false;
+            }
+            finally
+            {
+
+            }
+            return result;
+        }
+
+        private bool Add_C_Transaction(C_Transaction transaction)
+        {
+            bool result = false;
+            try
+            {
+                long transaction_output;
+                using (var context = new DB_Sec_Pay())
+                {
+                    context.C_Transactions.Add(transaction);
+                    transaction_output = context.SaveChanges();
+                }
+
+                int output;
+                using (var context = new DB_Sec_Pay())
+                {
+                    var input = context.TransactionSteps
+                    .Where(w => w.TransactionStepID == transaction.TransactionStepID)
+                    .FirstOrDefault();
+
+                    input.StepID = (long)secured.pay.api.Enums.Step.PaymentCreated;
+                    input.ModifiedOn = DateTime.Now;
+                    output = context.SaveChanges();
+                }
+                result = true;
+            }
+            catch (Exception ex)
             {
                 result = false;
             }

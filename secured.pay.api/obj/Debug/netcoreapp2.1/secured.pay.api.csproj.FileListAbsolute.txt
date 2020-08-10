@@ -31,7 +31,6 @@ E:\Projects\pay\secured.pay\secured.pay.api\bin\Debug\netcoreapp2.1\secured.pay.
 E:\Projects\pay\secured.pay\secured.pay.api\bin\Debug\netcoreapp2.1\secured.pay.api.runtimeconfig.dev.json
 E:\Projects\pay\secured.pay\secured.pay.api\bin\Debug\netcoreapp2.1\secured.pay.api.dll
 E:\Projects\pay\secured.pay\secured.pay.api\bin\Debug\netcoreapp2.1\secured.pay.api.pdb
-E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.api.csprojAssemblyReference.cache
 E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.api.csproj.CoreCompileInputs.cache
 E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.api.RazorAssemblyInfo.cache
 E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.api.RazorAssemblyInfo.cs
@@ -40,3 +39,4 @@ E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.
 E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.api.RazorTargetAssemblyInfo.cache
 E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.api.dll
 E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.api.pdb
+E:\Projects\pay\secured.pay\secured.pay.api\obj\Debug\netcoreapp2.1\secured.pay.api.csprojAssemblyReference.cache

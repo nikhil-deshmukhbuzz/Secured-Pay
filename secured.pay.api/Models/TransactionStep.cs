@@ -32,5 +32,6 @@ namespace secured.pay.api.Models
         public DateTime? CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }
         public string SuscriptionNumber { get; set; }
+        public string InvoiceNumber { get; set; }
     }
 }
